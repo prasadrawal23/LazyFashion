@@ -1,0 +1,7 @@
+{
+   "firstName": "John",
+      "lastName": "Smith",
+      "address": "1002 Main Street, Springfield TX",
+      "postal": "77002",
+      "country": "USA"
+}

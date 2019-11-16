@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="customer" format="json">
+      <types:shape format="weave" example="examples/sample12345.json"><![CDATA[%dw 2.0
+
+type customer = {|
+  firstName: String, 
+  lastName: String, 
+  address: String, 
+  postal: String, 
+  country: String
+|} {"example": "{\"firstName\":\"John\",\"lastName\":\"Smith\",\"address\":\"1002 Main Street, Springfield TX\",\"postal\":\"77002\",\"country\":\"USA\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#e3c1a47b-a212-451f-a7ba-c1c818a4d436">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="customer"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

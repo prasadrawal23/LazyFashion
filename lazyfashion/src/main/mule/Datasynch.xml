@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="4972ec9a-c02a-4455-93c2-0fbb72a86eb8" >
+		<db:my-sql-connection host="db4free.net" port="3306" user="ramesh123" password="ramesh123" database="apiserodatabase" />
+	</db:config>
+	<flow name="updateDB" doc:id="00e5599a-1e76-4e13-94d4-4f8642bfda6d" >
+		<scheduler doc:name="Scheduler" doc:id="cefc906d-4cb4-4f46-ad69-15463ff8a556" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<salesforce:query-all doc:name="fetch Data from SFDC" doc:id="9801b99f-c81e-4854-b9c2-df7632ca61de" config-ref="Salesforce_Config" >
+			<salesforce:salesforce-query >SELECT address__c,country__c,CreatedById,customer_ID__c,lastName__c,Name__c,postalPin__c FROM LazyCustomer__c</salesforce:salesforce-query>
+		</salesforce:query-all>
+		<ee:transform doc:name="Transform Message" doc:id="926864e8-40f8-45e1-8d0c-dd4328a504f0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="de56e0fc-ae6c-4a21-9138-4ef1738ce406" config-ref="Database_Config">
+			<db:sql >insert into customers ()
+values(:AccountNumber, :Name, :BillingStreet, :BillingCity, :BillingState, :BillingPostalCode)</db:sql>
+		</db:insert>
+	</flow>
+	<flow name="vacateData" doc:id="6fd617cb-8b94-4d3f-acc9-2cb2dda2485c" >
+		<scheduler doc:name="Scheduler" doc:id="7eaa910f-f646-4891-897c-cf7afec22043" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<db:delete doc:name="Delete" doc:id="84c39a3a-e08d-438e-883a-b7de82e25e64" config-ref="Database_Config">
+			<db:sql >TRUNCATE TABLE  lazyFPrasad
+</db:sql>
+		</db:delete>
+	</flow>
+</mule>

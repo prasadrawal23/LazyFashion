@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="982b8114-6831-42f7-9082-e94e0a7ae1f7" >
+		<salesforce:cached-basic-connection username="prasad.rawal23@gmail.com" password="Saroj@123" securityToken="hkKc33xe5jMnIZ7v49y1k4Fvy" />
+	</salesforce:sfdc-config>
+	<flow name="retrieve_DataSFDC" doc:id="ec6ba186-5952-469c-ba43-f9e107a0afa3" >
+		<salesforce:query-all doc:name="Query all" doc:id="0c6c5c9c-bd67-4812-a1ec-2f0efc143911" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT address__c,country__c,CreatedById,customer_ID__c,lastName__c,Name__c,postalPin__c FROM LazyCustomer__c</salesforce:salesforce-query>
+		</salesforce:query-all>
+		<logger level="INFO" doc:name="Logger" doc:id="a96c628d-773b-4439-b120-89dfadabbc2c" message="records loaded successfully"/>
+	</flow>
+	<flow name="update_DataSFDC" doc:id="a1579dbd-fbce-40d6-87fd-9e16c440aeca" >
+		<salesforce:update doc:name="Update" doc:id="851b1d11-b903-4d1f-b563-069bc2dbf14e" config-ref="Salesforce_Config" type="LazyCustomer__c"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4f02901f-66b8-4491-8356-683ab7473def" message="data update successfully  from implentation"/>
+	</flow>
+	<flow name="create_DataSFDC" doc:id="6c7d856f-d110-4e6b-9f0c-b1eec22ab98d" >
+		<ee:transform doc:name="Transform Message" doc:id="e3c1a47b-a212-451f-a7ba-c1c818a4d436" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	
+	Name__c: payload.firstName ,
+	lastName__c: payload.lastName,
+	address__c: payload.address,
+	postalPin__c: payload.postal as Number,
+	country__c: payload.country
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="a83ad489-f20c-4a76-8577-b4900bd3d9a8" config-ref="Salesforce_Config" type="LazyCustomer__c"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7c9990d9-870f-468a-ba35-2f7f7599ac33" message="records created successfully"/>
+	</flow>
+</mule>
